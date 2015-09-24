@@ -15,7 +15,8 @@ class Arguments(object):
     coveralls_url = 'https://coveralls.io/api/v1/jobs'
     repo_token = 'abcdef1234569abdcef'
     service_job_id = '4699301'
-    service_name = 'travi-ci',
+    service_name = 'travi-ci'
+    service_pull_request = '123'
     base_dir = os.path.abspath('python-coveralls-example')
     data_file = os.path.join(base_dir, '.coverage')
     config_file = os.path.join(base_dir, '.coveragerc')
@@ -129,7 +130,8 @@ class CoverallsTestCase(TestCase):
             service_name=Arguments.service_name,
             git=GIT_EXP,
             source_files=SOURCE_FILES,
-            parallel=Arguments.parallel
+            parallel=Arguments.parallel,
+            service_pull_request=Arguments.service_pull_request
         )
         self.assertEqual(response.json(), {u'url': u'https://coveralls.io/jobs/5722', u'message': u'Job #5.1 - 100.0% Covered'})
 
@@ -140,12 +142,16 @@ class CoverallsTestCase(TestCase):
             service_name=Arguments.service_name,
             git=GIT_EXP,
             source_files=SOURCE_FILES,
-            parallel=Arguments.parallel
+            parallel=Arguments.parallel,
+            service_pull_request=Arguments.service_pull_request
         )
+        data = json.loads(json_file.read())
         self.assertEqual(
-            json.loads(json_file.read())['source_files'][1]['source'],
+            data['source_files'][1]['source'],
             u'# coding=utf-8\nEUR = "€"\n\n\ndef amount(tariff, currency=EUR):\n    return \'{0} {1:.2f}\'.format(currency, float(tariff))'
         )
+
+        self.assertEqual(data['service_pull_request'], '123')
 
 
 class NotAFileTestCase(TestCase):

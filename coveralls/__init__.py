@@ -1,5 +1,5 @@
 __author__ = 'Andrea De Marco <24erre@gmail.com>'
-__version__ = '2.5.1'
+__version__ = '2.5.2'
 __classifiers__ = [
     'Development Status :: 5 - Production/Stable',
     'Intended Audience :: Developers',
@@ -70,6 +70,7 @@ def parse_args():
     args.service_name = yml.get('service_name', 'travis-ci')
     args.service_job_id = os.environ.get('TRAVIS_JOB_ID', '')
     args.parallel = yml.get('parallel', os.environ.get('COVERALLS_PARALLEL', False))
+    args.service_pull_request = os.environ.get('CI_PULL_REQUEST', False)
     return args
 
 
@@ -91,6 +92,7 @@ def wear(args=None):
         git=gitrepo(args.base_dir) if not args.nogit else {},
         source_files=coverage.coveralls(args.base_dir, ignore_errors=args.ignore_errors, merge_file=args.merge_file),
         parallel=args.parallel,
+        service_pull_request=args.service_pull_request,
     )
     logger.info(response.status_code)
     logger.info(response.text)
